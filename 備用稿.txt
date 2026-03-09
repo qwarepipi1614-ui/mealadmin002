@@ -1,0 +1,14 @@
+為了讓網址變得更簡短且不需要完整輸入檔名，我也幫您複製了一份命名為 index.html 一起上傳上去。
+
+以下是開放給員工填寫的專屬網址，您可以直接點擊查看： 🔗 主網址 (推薦使用)： https://qwarepipi1614-ui.github.io/mealadmin002/ 🔗 備用網址 (直接連到檔名)： https://qwarepipi1614-ui.github.io/mealadmin002/meal-system.html
+
+
+全新對外的網址 (GitHub Pages)
+請依照您的儲存庫結構，提交這些代碼到 GitHub 後，可以使用以下對外網址：
+
+入口大廳 (發給所有人統一由此進)： https://qwarepipi1614-ui.github.io/mealadmin002/index.html (或者如果 GitHub Pages 設定正確，也可以直接輸入 https://qwarepipi1614-ui.github.io/mealadmin002/ )
+其他網址（您可以直接單獨複製給特定的對象）：
+
+專屬點餐網址 (只給員工點這裡)： https://qwarepipi1614-ui.github.io/mealadmin002/order.html
+專屬報表網址 (給需要查報表的人)： https://qwarepipi1614-ui.github.io/mealadmin002/report.html
+專屬管理後台 (自己留存)： https://qwarepipi1614-ui.github.io/mealadmin002/admin.html

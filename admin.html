@@ -995,24 +995,25 @@
 
   <!-- ══════════════ HOME ══════════════ -->
   <div class="screen active" id="screen-home">
-    <div style="text-align:center;padding:80px 20px 0;position:relative;">
-      <a href="admin.html"
-        style="position: absolute; top: 20px; right: 20px; color: var(--primary); font-weight: 600; text-decoration: none; font-size: 14px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: var(--shadow); display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow-lg)'"
-        onmouseout="this.style.transform='none';this.style.boxShadow='var(--shadow)'">⚙️ 管理員後台</a>
+    <div style="text-align:center;padding:80px 20px 0">
       <div class="home-title">應用開發部點餐系統</div>
       <div class="home-sub">簡化點餐流程，提升效率</div>
     </div>
     <div class="home-cards"
       style="margin:0 auto;max-width:900px;display:flex;gap:24px;flex-wrap:wrap;justify-content:center;padding:0 20px 60px">
-      <!-- Admin card removed, now accessed via top right link -->
-      <div class="home-card" onclick="window.location.href='order.html'">
+      <div class="home-card" onclick="goLogin()">
+        <div class="home-card-icon icon-blue">⚙️</div>
+        <div class="home-card-title">管理員</div>
+        <div class="home-card-desc">建立點餐活動、管理員工名單</div>
+        <div class="home-card-link link-blue">進入管理 →</div>
+      </div>
+      <div class="home-card" onclick="goOrderSelect()">
         <div class="home-card-icon icon-green">📋</div>
         <div class="home-card-title">我要點餐</div>
         <div class="home-card-desc">選擇餐點和飲料</div>
         <div class="home-card-link link-green">開始點餐 →</div>
       </div>
-      <div class="home-card" onclick="window.location.href='report.html'">
+      <div class="home-card" onclick="goReportSelect()">
         <div class="home-card-icon icon-purple">📊</div>
         <div class="home-card-title">查看報表</div>
         <div class="home-card-desc">訂單統計與分析</div>
@@ -1039,7 +1040,7 @@
         style="border-radius: 8px; padding: 14px; font-size: 16px; margin-bottom: 24px;">登入</button>
       <div style="text-align: center;">
         <a href="#" style="color: var(--primary); text-decoration: none; font-size: 15px; font-weight: 500;"
-          onclick="event.preventDefault(); show('home')">返回首頁</a>
+          onclick="event.preventDefault(); window.location.href='index.html'">返回首頁</a>
       </div>
     </div>
   </div>
@@ -1053,7 +1054,7 @@
       </div>
       <div class="admin-topbar-btns">
         <button class="btn btn-red btn-sm" onclick="doLogout()">登出</button>
-        <button class="btn btn-gray btn-sm" onclick="show('home')">返回首頁</button>
+        <button class="btn btn-gray btn-sm" onclick="window.location.href='index.html'">返回首頁</button>
       </div>
     </div>
 
@@ -1317,6 +1318,34 @@
     </div>
   </div>
 
+  <!-- Edit Member -->
+  <div class="overlay" id="overlay-edit-member">
+    <div class="modal" style="width:380px">
+      <div class="modal-header">
+        <div class="modal-title">編輯人員</div>
+        <button class="modal-close" onclick="closeModal('overlay-edit-member')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-member-id">
+        <div class="field-group">
+          <div class="field-label">部門</div>
+          <div style="display:flex;gap:8px">
+            <select class="field-input" id="edit-member-dept"
+              style="flex:1; background: #f5f7fa; color: #a0aec0; cursor: not-allowed;" disabled></select>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">姓名</div>
+          <input class="field-input" type="text" id="edit-member-name">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray" onclick="closeModal('overlay-edit-member')">取消</button>
+        <button class="btn btn-primary" onclick="saveMember()">儲存</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Dept -->
   <div class="overlay" id="overlay-add-dept">
     <div class="modal" style="width:360px">
@@ -1482,7 +1511,7 @@
 
     function doLogout() {
       isAuthed = false;
-      show('home');
+      window.location.href = 'index.html';
       showToast('已登出');
     }
 
@@ -1537,6 +1566,20 @@
       show('new-activity');
     }
 
+    function moveOptionUp(btn) {
+      const row = btn.closest('.option-row');
+      if (row.previousElementSibling) {
+        row.parentNode.insertBefore(row, row.previousElementSibling);
+      }
+    }
+
+    function moveOptionDown(btn) {
+      const row = btn.closest('.option-row');
+      if (row.nextElementSibling) {
+        row.parentNode.insertBefore(row.nextElementSibling, row);
+      }
+    }
+
     function addCreateOptionField(containerId, placeholderPrefix, placeholderDirect = '') {
       const container = document.getElementById(containerId);
       if (container.children.length >= 10) { showToast('最多 10 個選項'); return; }
@@ -1546,7 +1589,9 @@
       const placeholderText = placeholderDirect || `${placeholderPrefix} ${index}`;
       row.innerHTML = `
     <input class="field-input" type="text" placeholder="${placeholderText}">
-    ${index === 1 ? '<div style="width:48px"></div>' : '<button class="btn btn-red btn-sm" tabindex="-1" onclick="this.parentElement.remove()">刪除</button>'}
+    <button class="btn btn-gray btn-sm" tabindex="-1" style="padding:4px 8px" onclick="moveOptionUp(this)">↑</button>
+    <button class="btn btn-gray btn-sm" tabindex="-1" style="padding:4px 8px" onclick="moveOptionDown(this)">↓</button>
+    <button class="btn btn-red btn-sm" tabindex="-1" onclick="this.parentElement.remove()">刪除</button>
   `;
       container.appendChild(row);
     }
@@ -1614,7 +1659,9 @@
       row.className = 'option-row';
       row.innerHTML = `
     <input class="field-input" type="text" value="${value}" placeholder="輸入選項">
-    <button class="btn btn-red btn-sm" onclick="this.parentElement.remove()">刪除</button>
+    <button class="btn btn-gray btn-sm" tabindex="-1" style="padding:4px 8px" onclick="moveOptionUp(this)">↑</button>
+    <button class="btn btn-gray btn-sm" tabindex="-1" style="padding:4px 8px" onclick="moveOptionDown(this)">↓</button>
+    <button class="btn btn-red btn-sm" tabindex="-1" onclick="this.parentElement.remove()">刪除</button>
   `;
       container.appendChild(row);
     }
@@ -1656,9 +1703,13 @@
       el.innerHTML = Object.entries(byDept).map(([code, members]) => `
     <div>
       <div class="member-dept-header">${getDeptLabel(code)} <span style="font-size:12px;font-weight:400">${members.length} 人</span></div>
-      ${members.map(m => `
+      ${members.map((m, i) => `
         <div class="member-row">
+          <div style="font-size:12px;color:var(--muted);width:24px;text-align:right">${i + 1}.</div>
           <div class="member-name">${m.name}</div>
+          <button class="btn btn-gray btn-sm" style="padding:4px 8px;font-size:11px" onclick="moveMember(${m.id}, -1)">↑</button>
+          <button class="btn btn-gray btn-sm" style="padding:4px 8px;font-size:11px" onclick="moveMember(${m.id}, 1)">↓</button>
+          <button class="btn btn-gray btn-sm" onclick="openEditMember(${m.id})">編輯</button>
           <button class="btn btn-red btn-sm" onclick="deleteMember(${m.id})">刪除</button>
         </div>
       `).join('')}
@@ -1682,11 +1733,58 @@
       showToast('✅ 已新增：' + name);
     }
 
+    function moveMember(id, dir) {
+      const idx = D.members.findIndex(x => x.id === id);
+      if (idx < 0) return;
+      const m = D.members[idx];
+      const deptMembers = D.members.filter(x => x.dept === m.dept);
+      const deptIdx = deptMembers.findIndex(x => x.id === id);
+      const targetDeptIdx = deptIdx + dir;
+      if (targetDeptIdx < 0 || targetDeptIdx >= deptMembers.length) return;
+
+      const targetId = deptMembers[targetDeptIdx].id;
+      const globalTargetIdx = D.members.findIndex(x => x.id === targetId);
+
+      const temp = D.members[idx];
+      D.members[idx] = D.members[globalTargetIdx];
+      D.members[globalTargetIdx] = temp;
+
+      save(); renderMembers();
+    }
+
     function deleteMember(id) {
       const m = D.members.find(x => x.id === id);
       if (!confirm(`確定刪除「${m.name}」？`)) return;
       D.members = D.members.filter(x => x.id !== id);
       save(); renderMembers();
+    }
+
+    function openEditMember(id) {
+      const m = D.members.find(x => x.id === id);
+      if (!m) return;
+      document.getElementById('edit-member-id').value = id;
+      const sel = document.getElementById('edit-member-dept');
+      sel.innerHTML = D.depts.map(d => `<option value="${d.code}">${d.code} ${d.name}</option>`).join('');
+      sel.value = m.dept;
+      document.getElementById('edit-member-name').value = m.name;
+      document.getElementById('overlay-edit-member').classList.add('show');
+    }
+
+    function saveMember() {
+      const id = parseInt(document.getElementById('edit-member-id').value);
+      const dept = document.getElementById('edit-member-dept').value;
+      const name = document.getElementById('edit-member-name').value.trim();
+      if (!name) { alert('請填寫姓名'); return; }
+
+      const m = D.members.find(x => x.id === id);
+      if (m) {
+        m.dept = dept;
+        m.name = name;
+        save();
+        closeModal('overlay-edit-member');
+        renderMembers();
+        showToast('✅ 已儲存變更');
+      }
     }
 
     function openAddDept() {
@@ -1993,7 +2091,7 @@
     }
 
     // ══ INIT ══
-    show('home');
+    show('login');
   </script>
 </body>
 

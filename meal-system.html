@@ -995,18 +995,17 @@
 
   <!-- ══════════════ HOME ══════════════ -->
   <div class="screen active" id="screen-home">
-    <div style="text-align:center;padding:80px 20px 0">
+    <div style="text-align:center;padding:80px 20px 0;position:relative;">
+      <a href="admin.html"
+        style="position: absolute; top: 20px; right: 20px; color: var(--primary); font-weight: 600; text-decoration: none; font-size: 14px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: var(--shadow); display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow-lg)'"
+        onmouseout="this.style.transform='none';this.style.boxShadow='var(--shadow)'">⚙️ 管理員後台</a>
       <div class="home-title">應用開發部點餐系統</div>
       <div class="home-sub">簡化點餐流程，提升效率</div>
     </div>
     <div class="home-cards"
       style="margin:0 auto;max-width:900px;display:flex;gap:24px;flex-wrap:wrap;justify-content:center;padding:0 20px 60px">
-      <div class="home-card" onclick="goLogin()">
-        <div class="home-card-icon icon-blue">⚙️</div>
-        <div class="home-card-title">管理員</div>
-        <div class="home-card-desc">建立點餐活動、管理員工名單</div>
-        <div class="home-card-link link-blue">進入管理 →</div>
-      </div>
+      <!-- Admin card removed, now accessed via top right link -->
       <div class="home-card" onclick="goOrderSelect()">
         <div class="home-card-icon icon-green">📋</div>
         <div class="home-card-title">我要點餐</div>
@@ -1788,7 +1787,12 @@
       const dept = document.getElementById('order-dept').value;
       const sel = document.getElementById('order-member');
       const members = D.members.filter(m => m.dept === dept);
-      sel.innerHTML = '<option value="">-- 選擇人員 --</option>' + members.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+      const a = getActivity(currentOrderActivityId);
+      sel.innerHTML = '<option value="">-- 選擇人員 --</option>' + members.map(m => {
+        const hasOrdered = a && a.orders.some(o => o.dept === dept && o.name === m.name);
+        const text = hasOrdered ? `${m.name} (已完成點餐)` : m.name;
+        return `<option value="${m.name}">${text}</option>`;
+      }).join('');
     }
 
     function selectMeal(i) {
@@ -1839,6 +1843,7 @@
       document.querySelectorAll('[id^="meal-card-"],[id^="drink-card-"]').forEach(el => { el.className = 'option-card'; });
       document.querySelectorAll('[id^="meal-dot-"],[id^="drink-dot-"]').forEach(el => { el.style.cssText = ''; });
       document.getElementById('order-note').value = '';
+      updateMemberSelect();
     }
 
     // ══════════════════════════════════════════
