@@ -47,12 +47,17 @@
 
     /* ── SCREENS ── */
     .screen {
-      display: none;
+      display: none !important;
       min-height: 100vh;
     }
 
     .screen.active {
-      display: block;
+      display: block !important;
+    }
+
+    #screen-home.active,
+    #screen-login.active {
+      display: flex !important;
     }
 
     /* ══════════════════════════════
