@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>應用開發部點餐系統</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f0f4ff;
+      --white: #ffffff;
+      --primary: #4a6cf7;
+      --primary-hover: #3a5ce6;
+      --primary-light: #eef1ff;
+      --green: #34c98a;
+      --green-light: #e6faf2;
+      --purple: #9b6cf7;
+      --purple-light: #f3eeff;
+      --red: #f76a6a;
+      --red-light: #fff0f0;
+      --orange: #f7a34a;
+      --gray: #6b7a90;
+      --border: #e2e8f0;
+      --text: #1a202c;
+      --muted: #718096;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      display: none !important;
+      min-height: 100vh;
+    }
+
+    .screen.active {
+      display: block !important;
+    }
+
+    #screen-home.active,
+    #screen-login.active {
+      display: flex !important;
+    }
+
+    /* ══════════════════════════════
+   HOME PAGE
+══════════════════════════════ */
+    #screen-home {
+      background: linear-gradient(160deg, #e8ecff 0%, #f0f4ff 50%, #e8f8f2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      min-height: 100vh;
+    }
+
+    .home-title {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .home-sub {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 56px;
+      text-align: center;
+    }
+
+    .home-cards {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 900px;
+    }
+
+    .home-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 36px 32px 28px;
+      width: 260px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .home-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: #d0d8ff;
+    }
+
+    .home-card-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    .icon-blue {
+      background: #eef1ff;
+    }
+
+    .icon-green {
+      background: #e6faf2;
+    }
+
+    .icon-purple {
+      background: #f3eeff;
+    }
+
+    .home-card-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .home-card-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .home-card-link {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .link-blue {
+      color: var(--primary);
+    }
+
+    .link-green {
+      color: var(--green);
+    }
+
+    .link-purple {
+      color: var(--purple);
+    }
+
+    /* ══════════════════════════════
+   ADMIN LOGIN
+══════════════════════════════ */
+    #screen-login {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #e8ecff 0%, #f0f4ff 100%);
+    }
+
+    .login-box {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 40px 36px;
+      width: 380px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .login-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .login-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+      transition: border-color 0.15s;
+    }
+
+    .login-input:focus {
+      border-color: var(--primary);
+    }
+
+    .login-input.error {
+      border-color: var(--red);
+      animation: shake 0.3s ease;
+    }
+
+    .login-error {
+      font-size: 12px;
+      color: var(--red);
+      height: 18px;
+      margin-bottom: 12px;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      25% {
+        transform: translateX(-6px)
+      }
+
+      75% {
+        transform: translateX(6px)
+      }
+    }
+
+    /* ══════════════════════════════
+   ADMIN PAGE
+══════════════════════════════ */
+    #screen-admin {
+      background: #f8f9fc;
+    }
+
+    .admin-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .admin-page-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .admin-page-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .admin-topbar-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 20px 32px 0;
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .tab-btn:not(.active) {
+      background: var(--white);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .admin-content {
+      padding: 24px 32px;
+    }
+
+    /* ── Activity List ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .activity-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .activity-info {
+      flex: 1;
+    }
+
+    .activity-name {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .activity-meta {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .activity-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Member list ── */
+    .member-table-wrap {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .member-dept-header {
+      padding: 12px 20px;
+      background: var(--primary-light);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .member-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid #f5f7fa;
+      gap: 12px;
+    }
+
+    .member-row:hover {
+      background: #fafbff;
+    }
+
+    .member-name {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    /* ══════════════════════════════
+   EDIT ACTIVITY
+══════════════════════════════ */
+    #screen-edit {
+      background: #f8f9fc;
+    }
+
+    .edit-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .edit-content {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+
+    .edit-section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .field-label {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+      color: var(--text);
+      background: white;
+    }
+
+    .field-input:focus {
+      border-color: var(--primary);
+    }
+
+    .field-group {
+      margin-bottom: 22px;
+    }
+
+    .option-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .option-row .field-input {
+      flex: 1;
+    }
+
+    .options-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .add-option-btn {
+      font-size: 13px;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 600;
+      background: none;
+      border: none;
+      font-family: inherit;
+    }
+
+    .add-option-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* ══════════════════════════════
+   ORDER PAGE
+══════════════════════════════ */
+    #screen-order {
+      background: var(--bg);
+    }
+
+    .order-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .order-topbar-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .order-topbar-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .order-content {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 28px 20px;
+    }
+
+    .order-activity-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .order-activity-date {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .order-section {
+      margin-bottom: 28px;
+    }
+
+    .order-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .option-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .option-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .option-card:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .option-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .option-card.selected-green {
+      border-color: var(--green);
+      background: var(--green-light);
+    }
+
+    .option-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .option-card.selected .option-dot {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .option-card.selected-green .option-dot {
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .option-card-label {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .dept-select-box {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ══════════════════════════════
+   REPORT PAGE
+══════════════════════════════ */
+    #screen-report {
+      background: #f8f9fc;
+    }
+
+    .report-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .report-content {
+      padding: 24px 32px;
+    }
+
+    .report-activity-select {
+      margin-bottom: 24px;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .report-stat {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .report-stat-val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .report-stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .report-table-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .report-table-header {
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .rtable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .rtable th {
+      padding: 10px 16px;
+      background: #f8f9fc;
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rtable td {
+      padding: 11px 16px;
+      border-bottom: 1px solid #f5f7fa;
+    }
+
+    .rtable tr:last-child td {
+      border-bottom: none;
+    }
+
+    .rtable tr:hover td {
+      background: #fafbff;
+    }
+
+    .summary-wrap {
+      overflow-x: auto;
+    }
+
+    .summary-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .summary-tbl th {
+      background: var(--primary);
+      color: white;
+      padding: 10px 12px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      white-space: nowrap;
+    }
+
+    .summary-tbl th.sub {
+      background: var(--primary-hover);
+      font-size: 11px;
+    }
+
+    .summary-tbl td {
+      padding: 9px 12px;
+      text-align: center;
+      border: 1px solid var(--border);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary-tbl td.dept-td {
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-light);
+      white-space: nowrap;
+    }
+
+    .summary-tbl td.total-td {
+      font-weight: 700;
+      background: #f0f4ff;
+    }
+
+    .summary-tbl tr.total-row td {
+      background: var(--text);
+      color: white;
+      font-weight: 700;
+    }
+
+    /* ══ BUTTONS ══ */
+    .btn {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-green:hover {
+      background: #28b87a;
+    }
+
+    .btn-purple {
+      background: var(--purple);
+      color: white;
+    }
+
+    .btn-purple:hover {
+      background: #8558e6;
+    }
+
+    .btn-red {
+      background: var(--red-light);
+      color: var(--red);
+      border: 1px solid #ffd0d0;
+    }
+
+    .btn-red:hover {
+      background: #ffe0e0;
+    }
+
+    .btn-gray {
+      background: #f0f2f5;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-gray:hover {
+      background: #e8eaf0;
+    }
+
+    .btn-orange {
+      background: #fff3e0;
+      color: var(--orange);
+      border: 1px solid #ffe0b0;
+    }
+
+    .btn-orange:hover {
+      background: #ffe8c0;
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+
+    .btn-lg {
+      padding: 13px 32px;
+      font-size: 15px;
+    }
+
+    .btn-block {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* ══ BADGES ══ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-active {
+      background: #e6faf2;
+      color: var(--green);
+    }
+
+    .badge-ended {
+      background: #f0f2f5;
+      color: var(--muted);
+    }
+
+    /* ══ MODAL ══ */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 400;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(3px);
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius);
+      width: 440px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.94) translateY(-10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0)
+      }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: var(--bg);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* ══ TOAST ══ */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--text);
+      color: white;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-size: 14px;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      pointer-events: none;
+      max-width: 300px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ══ MISC ══ */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    select.field-input {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════ HOME ══════════════ -->
+  <div class="screen active" id="screen-home">
+    <div style="text-align:center;padding:80px 20px 0;position:relative;">
+      <a href="admin.html"
+        style="position: absolute; top: 20px; right: 20px; color: var(--primary); font-weight: 600; text-decoration: none; font-size: 14px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: var(--shadow); display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow-lg)'"
+        onmouseout="this.style.transform='none';this.style.boxShadow='var(--shadow)'">⚙️ 管理員後台</a>
+      <div class="home-title">應用開發部點餐系統</div>
+      <div class="home-sub">簡化點餐流程，提升效率</div>
+    </div>
+    <div class="home-cards"
+      style="margin:0 auto;max-width:900px;display:flex;gap:24px;flex-wrap:wrap;justify-content:center;padding:0 20px 60px">
+      <!-- Admin card removed, now accessed via top right link -->
+      <div class="home-card" onclick="goOrderSelect()">
+        <div class="home-card-icon icon-green">📋</div>
+        <div class="home-card-title">我要點餐</div>
+        <div class="home-card-desc">選擇餐點和飲料</div>
+        <div class="home-card-link link-green">開始點餐 →</div>
+      </div>
+      <div class="home-card" onclick="goReportSelect()">
+        <div class="home-card-icon icon-purple">📊</div>
+        <div class="home-card-title">查看報表</div>
+        <div class="home-card-desc">訂單統計與分析</div>
+        <div class="home-card-link link-purple">查看報表 →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ LOGIN ══════════════ -->
+  <div class="screen" id="screen-login">
+    <div class="login-box"
+      style="margin:auto;margin-top:20vh; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+      <div class="login-title" style="font-size: 28px; margin-bottom: 8px;">管理員登入</div>
+      <div class="login-sub" style="font-size: 16px; margin-bottom: 32px;">請輸入管理員密碼</div>
+      <div style="text-align: left; margin-bottom: 24px;">
+        <div style="font-size: 15px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">密碼</div>
+        <input class="login-input" type="password" id="login-pw" placeholder="••••••••"
+          style="background: #eef4ff; border: 1px solid #d0daff; text-align: left; border-radius: 8px; padding: 14px 16px; font-size: 18px; width: 100%; letter-spacing: 2px;"
+          onkeydown="if(event.key==='Enter')doLogin()"
+          oninput="this.classList.remove('error');document.getElementById('login-err').textContent=''">
+        <div class="login-error" id="login-err" style="margin-top:4px;"></div>
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()"
+        style="border-radius: 8px; padding: 14px; font-size: 16px; margin-bottom: 24px;">登入</button>
+      <div style="text-align: center;">
+        <a href="#" style="color: var(--primary); text-decoration: none; font-size: 15px; font-weight: 500;"
+          onclick="event.preventDefault(); show('home')">返回首頁</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ADMIN ══════════════ -->
+  <div class="screen" id="screen-admin">
+    <div class="admin-topbar">
+      <div>
+        <div class="admin-page-title">管理員後台</div>
+        <div class="admin-page-sub">管理點餐活動與員工名單</div>
+      </div>
+      <div class="admin-topbar-btns">
+        <button class="btn btn-red btn-sm" onclick="doLogout()">登出</button>
+        <button class="btn btn-gray btn-sm" onclick="show('home')">返回首頁</button>
+      </div>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="tab-btn active" id="tab-activities" onclick="switchTab('activities')">點餐活動</button>
+      <button class="tab-btn" id="tab-members" onclick="switchTab('members')">員工名單</button>
+    </div>
+
+    <div class="admin-content">
+      <!-- Activities Tab -->
+      <div id="tab-content-activities">
+        <div class="section-header">
+          <div class="section-title">點餐活動列表</div>
+          <button class="btn btn-primary" onclick="openNewActivity()">＋ 建立新活動</button>
+        </div>
+        <div id="activities-list"></div>
+      </div>
+
+      <!-- Members Tab -->
+      <div id="tab-content-members" style="display:none">
+        <div class="section-header">
+          <div class="section-title">員工名單</div>
+          <button class="btn btn-primary" onclick="openAddMember()">＋ 新增人員</button>
+        </div>
+        <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--muted)">篩選部門：</div>
+          <div id="dept-filter-tabs" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        </div>
+        <div class="member-table-wrap" id="members-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ EDIT ACTIVITY ══════════════ -->
+  <div class="screen" id="screen-edit">
+    <div class="edit-topbar">
+      <div style="font-size:18px;font-weight:700">編輯活動選項</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-gray btn-sm" onclick="show('admin')">← 返回</button>
+        <button class="btn btn-primary btn-sm" onclick="saveActivity()">💾 儲存</button>
+      </div>
+    </div>
+    <div class="edit-content">
+      <input type="hidden" id="edit-activity-id">
+      <div class="field-group">
+        <div class="field-label">活動名稱</div>
+        <input class="field-input" type="text" id="edit-name" placeholder="例：0326部門聚餐">
+      </div>
+      <div class="field-group">
+        <div class="field-label">日期</div>
+        <input class="field-input" type="date" id="edit-date">
+      </div>
+
+      <div class="field-group">
+        <div class="options-header">
+          <div class="field-label" style="margin:0">餐點選項（最多 10 個）</div>
+          <button class="add-option-btn" onclick="addOptionField('meals-fields')">＋ 新增餐點</button>
+        </div>
+        <div id="meals-fields"></div>
+      </div>
+
+      <div class="field-group">
+        <div class="options-header">
+          <div class="field-label" style="margin:0">飲料選項（最多 10 個）</div>
+          <button class="add-option-btn" onclick="addOptionField('drinks-fields')">＋ 新增飲料</button>
+        </div>
+        <div id="drinks-fields"></div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">備註欄位說明（點餐頁面顯示給員工的提示文字，留空則不顯示）</div>
+        <input class="field-input" type="text" id="edit-note-label" placeholder="例：過敏食材、特殊需求...">
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ORDER SELECT (choose activity) ══════════════ -->
+  <div class="screen" id="screen-order-select">
+    <div class="order-topbar">
+      <div>
+        <div class="order-topbar-title">我要點餐</div>
+        <div class="order-topbar-sub">請選擇點餐活動</div>
+      </div>
+      <button class="btn btn-gray btn-sm" onclick="show('home')">← 返回首頁</button>
+    </div>
+    <div style="max-width:600px;margin:0 auto;padding:28px 20px">
+      <div id="order-select-list"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ORDER FORM ══════════════ -->
+  <div class="screen" id="screen-order">
+    <div class="order-topbar">
+      <div>
+        <div class="order-topbar-title" id="order-topbar-title">點餐</div>
+        <div class="order-topbar-sub">請選擇您的餐點</div>
+      </div>
+      <button class="btn btn-gray btn-sm" onclick="show('order-select')">← 返回</button>
+    </div>
+    <div class="order-content">
+      <div class="order-activity-name" id="order-act-name"></div>
+      <div class="order-activity-date" id="order-act-date"></div>
+
+      <div class="order-section">
+        <div class="order-section-title">選擇部門</div>
+        <div class="dept-select-box">
+          <select class="field-input" id="order-dept" style="border:none;outline:none;flex:1;font-size:15px"></select>
+        </div>
+      </div>
+
+      <div class="order-section">
+        <div class="order-section-title">選擇人員</div>
+        <div class="dept-select-box">
+          <select class="field-input" id="order-member" style="border:none;outline:none;flex:1;font-size:15px"></select>
+        </div>
+        <div style="margin-top:8px">
+          <input class="field-input" type="text" id="order-name-manual" placeholder="或直接輸入姓名">
+        </div>
+      </div>
+
+      <div class="order-section">
+        <div class="order-section-title">選擇餐點</div>
+        <div class="option-cards" id="meal-options"></div>
+      </div>
+
+      <div class="order-section">
+        <div class="order-section-title">選擇飲料</div>
+        <div class="option-cards" id="drink-options"></div>
+      </div>
+
+      <div class="order-section" id="note-section" style="display:none">
+        <div class="order-section-title" id="note-section-title">備註</div>
+        <textarea class="field-input" id="order-note" rows="3" placeholder="請輸入備註..."></textarea>
+      </div>
+
+      <button class="btn btn-green btn-block btn-lg" onclick="submitOrder()">確認點餐 ✓</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ REPORT SELECT ══════════════ -->
+  <div class="screen" id="screen-report-select">
+    <div class="order-topbar">
+      <div>
+        <div class="order-topbar-title">查看報表</div>
+        <div class="order-topbar-sub">請選擇要查看的活動</div>
+      </div>
+      <button class="btn btn-gray btn-sm" onclick="window.location.href='index.html'">🚪 登出 (回首頁)</button>
+    </div>
+    <div style="max-width:600px;margin:0 auto;padding:28px 20px">
+      <div id="report-select-list"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ REPORT ══════════════ -->
+  <div class="screen" id="screen-report">
+    <div class="report-topbar">
+      <div>
+        <div style="font-size:20px;font-weight:700" id="report-title">報表</div>
+        <div style="font-size:13px;color:var(--muted)" id="report-subtitle"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-green btn-sm" onclick="copySummary()">📋 複製統計表</button>
+        <button class="btn btn-primary btn-sm" onclick="downloadOrders()">⬇ 下載清單</button>
+        <button class="btn btn-gray btn-sm" onclick="show('report-select')">← 返回</button>
+      </div>
+    </div>
+    <div class="report-content">
+      <div class="report-grid" id="report-stats"></div>
+      <div class="report-table-card">
+        <div class="report-table-header">📋 點餐明細</div>
+        <div style="overflow-x:auto">
+          <table class="rtable" id="report-detail-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>姓名</th>
+                <th>部門</th>
+                <th>餐點</th>
+                <th>飲料</th>
+                <th>備註</th>
+              </tr>
+            </thead>
+            <tbody id="report-detail-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="report-table-card">
+        <div class="report-table-header">📊 部門統計</div>
+        <div class="summary-wrap" id="report-summary"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODALS ══ -->
+  <!-- ══════════════ NEW ACTIVITY (SCREEN) ══════════════ -->
+  <div class="screen" id="screen-new-activity">
+    <div
+      style="max-width: 600px; margin: 40px auto; background: var(--white); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 32px;">
+      <div style="font-size: 22px; font-weight: 700; margin-bottom: 24px;">建立新活動</div>
+
+      <div class="field-group">
+        <div class="field-label">活動名稱</div>
+        <input class="field-input" type="text" id="create-name" placeholder="例如: 02/06 聚餐">
+      </div>
+      <div class="field-group">
+        <div class="field-label">日期</div>
+        <input class="field-input" type="text" id="create-date" placeholder="例如: 2025-02-06" onfocus="this.type='date'"
+          onblur="if(!this.value)this.type='text'">
+      </div>
+
+      <div class="field-group">
+        <div class="options-header">
+          <div class="field-label" style="margin:0">餐點選項 (最多 10 個)</div>
+          <button class="add-option-btn" onclick="addCreateOptionField('create-meals-fields', '餐點')">＋ 新增</button>
+        </div>
+        <div id="create-meals-fields"></div>
+      </div>
+
+      <div class="field-group" style="margin-bottom: 32px;">
+        <div class="options-header">
+          <div class="field-label" style="margin:0">飲料選項 (最多 10 個)</div>
+          <button class="add-option-btn" onclick="addCreateOptionField('create-drinks-fields', '飲料')">＋ 新增</button>
+        </div>
+        <div id="create-drinks-fields"></div>
+      </div>
+
+      <div style="display: flex; gap: 16px;">
+        <button class="btn btn-primary btn-lg" style="flex: 1; border-radius: 8px; justify-content: center;"
+          onclick="doCreateActivity()">建立活動</button>
+        <button class="btn btn-gray btn-lg"
+          style="flex: 1; border-radius: 8px; background: #e2e8f0; color: #4a5568; justify-content: center; border: none;"
+          onclick="show('admin')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Member -->
+  <div class="overlay" id="overlay-add-member">
+    <div class="modal" style="width:380px">
+      <div class="modal-header">
+        <div class="modal-title">新增人員</div>
+        <button class="modal-close" onclick="closeModal('overlay-add-member')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <div class="field-label">部門</div>
+          <div style="display:flex;gap:8px">
+            <select class="field-input" id="new-member-dept" style="flex:1"></select>
+            <button class="btn btn-gray btn-sm" onclick="openAddDept()">＋部門</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">姓名</div>
+          <input class="field-input" type="text" id="new-member-name" placeholder="王小明">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray" onclick="closeModal('overlay-add-member')">取消</button>
+        <button class="btn btn-primary" onclick="addMember()">新增</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Dept -->
+  <div class="overlay" id="overlay-add-dept">
+    <div class="modal" style="width:360px">
+      <div class="modal-header">
+        <div class="modal-title">新增部門</div>
+        <button class="modal-close" onclick="closeModal('overlay-add-dept')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <div class="field-label">部門代號（例：3007）</div>
+          <input class="field-input" type="text" id="new-dept-code" placeholder="3007">
+        </div>
+        <div class="field-group">
+          <div class="field-label">部門名稱</div>
+          <input class="field-input" type="text" id="new-dept-name" placeholder="資安部">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray"
+          onclick="closeModal('overlay-add-dept');document.getElementById('overlay-add-member').classList.add('show')">取消</button>
+        <button class="btn btn-primary" onclick="addDept()">新增</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ══════════════════════════════════════════
+    //   DATA
+    // ══════════════════════════════════════════
+    const ADMIN_PW = 'pipi1614';
+    let isAuthed = false;
+
+    function loadData() {
+      try {
+        const s = localStorage.getItem('meal_sys_v3');
+        if (s) return JSON.parse(s);
+      } catch (e) { }
+      return getDefaultData();
+    }
+
+    function getDefaultData() {
+      return {
+        nextId: 50,
+        depts: [
+          { code: '3005', name: '數位開發' },
+          { code: '3006', name: '平台開發' }
+        ],
+        members: [
+          { id: 1, name: '高念平', dept: '3005' }, { id: 2, name: '游國楷', dept: '3005' },
+          { id: 3, name: '謝楷評', dept: '3005' }, { id: 4, name: '陳春惠', dept: '3005' },
+          { id: 5, name: '薛仁奇', dept: '3005' }, { id: 6, name: '劉道鈞', dept: '3005' },
+          { id: 7, name: '李佳馨', dept: '3005' }, { id: 8, name: '吳文凱', dept: '3005' },
+          { id: 9, name: '吳柔潔', dept: '3005' }, { id: 10, name: '楊仲文', dept: '3005' },
+          { id: 11, name: '蔡恩傑', dept: '3005' }, { id: 12, name: '陳利和', dept: '3005' },
+          { id: 13, name: '吳政憲', dept: '3005' }, { id: 14, name: '黃明正', dept: '3005' },
+          { id: 15, name: '蕭智鴻', dept: '3005' }, { id: 16, name: '陳俊良', dept: '3005' },
+          { id: 17, name: '陳詩恬', dept: '3006' }, { id: 18, name: '彭俊濠', dept: '3006' },
+          { id: 19, name: '廖崇智', dept: '3006' }, { id: 20, name: '林怡君', dept: '3006' },
+          { id: 21, name: '謝正軒', dept: '3006' }, { id: 22, name: '張宏偉', dept: '3006' },
+          { id: 23, name: '張家菁', dept: '3006' }, { id: 24, name: '鄒易恆', dept: '3006' },
+          { id: 25, name: '黃晏瑜', dept: '3006' }, { id: 26, name: '林家銘', dept: '3006' },
+          { id: 27, name: '李聿芸', dept: '3006' }, { id: 28, name: '黃士哲', dept: '3006' },
+          { id: 29, name: '李國源', dept: '3006' }, { id: 30, name: '謝昀達', dept: '3006' },
+        ],
+        activities: [
+          {
+            id: 1, name: '0326部門聚餐', date: '2026-03-26', status: 'active',
+            meals: ['1.總匯特餐', '2.雞腿特餐', '3.排骨特餐', '4.叉燒特餐', '5.素食'],
+            drinks: ['A.青四季春無糖微冰', 'B.紅柚翡翠微糖微冰', 'C.珍珠奶茶微糖微冰'],
+            noteLabel: '備註（過敏食材、特殊需求）',
+            orders: [
+              { id: 1, name: '高念平', dept: '3005', meal: '2.雞腿特餐', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 2, name: '游國楷', dept: '3005', meal: '3.排骨特餐', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 3, name: '謝楷評', dept: '3005', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 4, name: '陳春惠', dept: '3005', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 5, name: '薛仁奇', dept: '3005', meal: '4.叉燒特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 6, name: '劉道鈞', dept: '3005', meal: '3.排骨特餐', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 7, name: '李佳馨', dept: '3005', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 8, name: '吳文凱', dept: '3005', meal: '3.排骨特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 9, name: '吳柔潔', dept: '3005', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 10, name: '楊仲文', dept: '3005', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 11, name: '蔡恩傑', dept: '3005', meal: '3.排骨特餐', drink: 'A.青四季春無糖微冰', note: '' },
+              { id: 12, name: '陳利和', dept: '3005', meal: '2.雞腿特餐', drink: 'A.青四季春無糖微冰', note: '' },
+              { id: 13, name: '吳政憲', dept: '3005', meal: '1.總匯特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 14, name: '黃明正', dept: '3005', meal: '2.雞腿特餐', drink: 'A.青四季春無糖微冰', note: '' },
+              { id: 15, name: '蕭智鴻', dept: '3005', meal: '3.排骨特餐', drink: 'A.青四季春無糖微冰', note: '' },
+              { id: 16, name: '陳俊良', dept: '3005', meal: '1.總匯特餐', drink: 'A.青四季春無糖微冰', note: '' },
+              { id: 17, name: '陳詩恬', dept: '3006', meal: '2.雞腿特餐', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 18, name: '彭俊濠', dept: '3006', meal: '2.雞腿特餐', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 19, name: '廖崇智', dept: '3006', meal: '1.總匯特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 20, name: '林怡君', dept: '3006', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 21, name: '謝正軒', dept: '3006', meal: '1.總匯特餐', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 22, name: '張宏偉', dept: '3006', meal: '5.素食', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 23, name: '張家菁', dept: '3006', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 24, name: '鄒易恆', dept: '3006', meal: '1.總匯特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 25, name: '黃晏瑜', dept: '3006', meal: '5.素食', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 26, name: '林家銘', dept: '3006', meal: '4.叉燒特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 27, name: '李聿芸', dept: '3006', meal: '2.雞腿特餐', drink: 'C.珍珠奶茶微糖微冰', note: '' },
+              { id: 28, name: '黃士哲', dept: '3006', meal: '2.雞腿特餐', drink: 'B.紅柚翡翠微糖微冰', note: '' },
+              { id: 29, name: '李國源', dept: '3006', meal: '5.素食', drink: 'A.青四季春無糖微冰', note: '' },
+              { id: 30, name: '謝昀達', dept: '3006', meal: '2.雞腿特餐', drink: 'A.青四季春無糖微冰', note: '' },
+            ]
+          }
+        ]
+      };
+    }
+
+    let D = loadData();
+    function save() { localStorage.setItem('meal_sys_v3', JSON.stringify(D)); }
+
+    // ══════════════════════════════════════════
+    //   UTILS
+    // ══════════════════════════════════════════
+    function show(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    function getDeptLabel(code) {
+      const d = D.depts.find(x => x.code === code);
+      return d ? `${d.code} ${d.name}` : code;
+    }
+
+    function getActivity(id) { return D.activities.find(a => a.id === id); }
+
+    // ══════════════════════════════════════════
+    //   LOGIN / LOGOUT
+    // ══════════════════════════════════════════
+    function goLogin() {
+      if (isAuthed) { renderAdmin(); show('admin'); return; }
+      show('login');
+      setTimeout(() => document.getElementById('login-pw').focus(), 100);
+    }
+
+    function doLogin() {
+      const pw = document.getElementById('login-pw').value;
+      if (pw === ADMIN_PW) {
+        isAuthed = true;
+        document.getElementById('login-pw').value = '';
+        renderAdmin();
+        show('admin');
+        showToast('🔓 登入成功');
+      } else {
+        const el = document.getElementById('login-pw');
+        el.classList.add('error');
+        document.getElementById('login-err').textContent = '密碼錯誤，請再試一次';
+        el.value = '';
+        setTimeout(() => el.focus(), 50);
+      }
+    }
+
+    function doLogout() {
+      isAuthed = false;
+      show('home');
+      showToast('已登出');
+    }
+
+    // ══════════════════════════════════════════
+    //   ADMIN
+    // ══════════════════════════════════════════
+    function switchTab(name) {
+      ['activities', 'members'].forEach(t => {
+        document.getElementById('tab-content-' + t).style.display = t === name ? '' : 'none';
+        document.getElementById('tab-' + t).classList.toggle('active', t === name);
+      });
+      if (name === 'members') renderMembers();
+    }
+
+    function renderAdmin() {
+      renderActivities();
+      renderMemberDeptFilter();
+    }
+
+    function renderActivities() {
+      const el = document.getElementById('activities-list');
+      if (!D.activities.length) {
+        el.innerHTML = '<div class="empty-state">尚無活動，請建立新活動</div>'; return;
+      }
+      el.innerHTML = D.activities.map(a => `
+    <div class="activity-card">
+      <div class="activity-info">
+        <div class="activity-name">${a.name} <span class="badge ${a.status === 'active' ? 'badge-active' : 'badge-ended'}">${a.status === 'active' ? '進行中' : '已結束'}</span></div>
+        <div class="activity-meta">日期: ${a.date}<br>餐點: ${a.meals.length} 項 ｜ 飲料: ${a.drinks.length} 項 ｜ 已點餐: ${a.orders.length} 人</div>
+      </div>
+      <div class="activity-actions">
+        <button class="btn btn-gray btn-sm" onclick="goEdit(${a.id})">編輯選項</button>
+        <button class="btn btn-green btn-sm" onclick="goOrderActivity(${a.id})">點餐頁</button>
+        <button class="btn btn-purple btn-sm" onclick="goReportActivity(${a.id})">查看報表</button>
+        ${a.status === 'active'
+          ? `<button class="btn btn-gray btn-sm" onclick="toggleStatus(${a.id})">結束</button>`
+          : `<button class="btn btn-orange btn-sm" onclick="toggleStatus(${a.id})">重啟</button>`}
+        <button class="btn btn-red btn-sm" onclick="deleteActivity(${a.id})">刪除</button>
+      </div>
+    </div>
+  `).join('');
+    }
+
+    function openNewActivity() {
+      document.getElementById('create-name').value = '';
+      document.getElementById('create-date').value = '';
+      document.getElementById('create-date').type = 'text';
+      document.getElementById('create-meals-fields').innerHTML = '';
+      document.getElementById('create-drinks-fields').innerHTML = '';
+      addCreateOptionField('create-meals-fields', '餐點', '餐點 1');
+      addCreateOptionField('create-drinks-fields', '飲料', '飲料 1');
+      show('new-activity');
+    }
+
+    function addCreateOptionField(containerId, placeholderPrefix, placeholderDirect = '') {
+      const container = document.getElementById(containerId);
+      if (container.children.length >= 10) { showToast('最多 10 個選項'); return; }
+      const row = document.createElement('div');
+      row.className = 'option-row';
+      const index = container.children.length + 1;
+      const placeholderText = placeholderDirect || `${placeholderPrefix} ${index}`;
+      row.innerHTML = `
+    <input class="field-input" type="text" placeholder="${placeholderText}">
+    ${index === 1 ? '<div style="width:48px"></div>' : '<button class="btn btn-red btn-sm" tabindex="-1" onclick="this.parentElement.remove()">刪除</button>'}
+  `;
+      container.appendChild(row);
+    }
+
+    function doCreateActivity() {
+      const name = document.getElementById('create-name').value.trim();
+      const date = document.getElementById('create-date').value;
+      if (!name) { alert('請填寫活動名稱'); return; }
+
+      const meals = Array.from(document.getElementById('create-meals-fields').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+      const drinks = Array.from(document.getElementById('create-drinks-fields').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+
+      if (meals.length === 0) { showToast('至少需填寫一項餐點'); return; }
+      if (drinks.length === 0) { showToast('至少需填寫一項飲料'); return; }
+
+      const id = D.nextId++;
+      D.activities.unshift({
+        id, name, date, status: 'active',
+        meals, drinks,
+        noteLabel: '', orders: []
+      });
+      save();
+      renderActivities();
+      show('admin');
+      showToast('✅ 活動建立成功');
+    }
+
+    function toggleStatus(id) {
+      const a = getActivity(id);
+      a.status = a.status === 'active' ? 'ended' : 'active';
+      save(); renderActivities();
+    }
+
+    function deleteActivity(id) {
+      const a = getActivity(id);
+      if (!confirm(`確定刪除活動「${a.name}」？此動作不可還原。`)) return;
+      D.activities = D.activities.filter(x => x.id !== id);
+      save(); renderActivities();
+      showToast('已刪除活動');
+    }
+
+    // ══ EDIT ══
+    function goEdit(id) {
+      const a = getActivity(id);
+      document.getElementById('edit-activity-id').value = id;
+      document.getElementById('edit-name').value = a.name;
+      document.getElementById('edit-date').value = a.date;
+      document.getElementById('edit-note-label').value = a.noteLabel || '';
+
+      const mf = document.getElementById('meals-fields');
+      mf.innerHTML = '';
+      a.meals.forEach((m, i) => addOptionField('meals-fields', m));
+
+      const df = document.getElementById('drinks-fields');
+      df.innerHTML = '';
+      a.drinks.forEach((d, i) => addOptionField('drinks-fields', d));
+
+      show('edit');
+    }
+
+    function addOptionField(containerId, value = '') {
+      const container = document.getElementById(containerId);
+      if (container.children.length >= 10) { showToast('最多 10 個選項'); return; }
+      const row = document.createElement('div');
+      row.className = 'option-row';
+      row.innerHTML = `
+    <input class="field-input" type="text" value="${value}" placeholder="輸入選項">
+    <button class="btn btn-red btn-sm" onclick="this.parentElement.remove()">刪除</button>
+  `;
+      container.appendChild(row);
+    }
+
+    function saveActivity() {
+      const id = parseInt(document.getElementById('edit-activity-id').value);
+      const a = getActivity(id);
+      a.name = document.getElementById('edit-name').value.trim() || a.name;
+      a.date = document.getElementById('edit-date').value;
+      a.noteLabel = document.getElementById('edit-note-label').value.trim();
+      a.meals = Array.from(document.getElementById('meals-fields').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+      a.drinks = Array.from(document.getElementById('drinks-fields').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+      save();
+      renderActivities();
+      show('admin');
+      showToast('✅ 已儲存');
+    }
+
+    // ══ MEMBERS ══
+    let memberDeptFilter = 'all';
+
+    function renderMemberDeptFilter() {
+      const el = document.getElementById('dept-filter-tabs');
+      const tabs = [{ code: 'all', name: '全部' }, ...D.depts];
+      el.innerHTML = tabs.map(d => `
+    <span class="dept-tab ${memberDeptFilter === d.code ? 'active' : ''}"
+      onclick="memberDeptFilter='${d.code}';renderMemberDeptFilter();renderMembers()"
+      style="padding:5px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:${memberDeptFilter === d.code ? 'var(--primary)' : 'white'};color:${memberDeptFilter === d.code ? 'white' : 'var(--muted)'};transition:all 0.15s;"
+    >${d.code === 'all' ? '全部' : d.code + ' ' + d.name}</span>
+  `).join('');
+    }
+
+    function renderMembers() {
+      const el = document.getElementById('members-list');
+      const filtered = memberDeptFilter === 'all' ? D.members : D.members.filter(m => m.dept === memberDeptFilter);
+      if (!filtered.length) { el.innerHTML = '<div class="empty-state">尚無人員</div>'; return; }
+      const byDept = {};
+      filtered.forEach(m => { if (!byDept[m.dept]) byDept[m.dept] = []; byDept[m.dept].push(m); });
+      el.innerHTML = Object.entries(byDept).map(([code, members]) => `
+    <div>
+      <div class="member-dept-header">${getDeptLabel(code)} <span style="font-size:12px;font-weight:400">${members.length} 人</span></div>
+      ${members.map(m => `
+        <div class="member-row">
+          <div class="member-name">${m.name}</div>
+          <button class="btn btn-red btn-sm" onclick="deleteMember(${m.id})">刪除</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+    }
+
+    function openAddMember() {
+      const sel = document.getElementById('new-member-dept');
+      sel.innerHTML = D.depts.map(d => `<option value="${d.code}">${d.code} ${d.name}</option>`).join('');
+      document.getElementById('new-member-name').value = '';
+      document.getElementById('overlay-add-member').classList.add('show');
+    }
+
+    function addMember() {
+      const dept = document.getElementById('new-member-dept').value;
+      const name = document.getElementById('new-member-name').value.trim();
+      if (!name) { alert('請填寫姓名'); return; }
+      D.members.push({ id: D.nextId++, name, dept });
+      save(); closeModal('overlay-add-member'); renderMembers(); renderMemberDeptFilter();
+      showToast('✅ 已新增：' + name);
+    }
+
+    function deleteMember(id) {
+      const m = D.members.find(x => x.id === id);
+      if (!confirm(`確定刪除「${m.name}」？`)) return;
+      D.members = D.members.filter(x => x.id !== id);
+      save(); renderMembers();
+    }
+
+    function openAddDept() {
+      closeModal('overlay-add-member');
+      document.getElementById('new-dept-code').value = '';
+      document.getElementById('new-dept-name').value = '';
+      document.getElementById('overlay-add-dept').classList.add('show');
+    }
+
+    function addDept() {
+      const code = document.getElementById('new-dept-code').value.trim();
+      const name = document.getElementById('new-dept-name').value.trim();
+      if (!code || !name) { alert('請填寫部門代號和名稱'); return; }
+      if (D.depts.find(d => d.code === code)) { alert('部門代號已存在'); return; }
+      D.depts.push({ code, name });
+      save(); closeModal('overlay-add-dept');
+      renderMemberDeptFilter();
+      openAddMember();
+      showToast('✅ 已新增部門');
+    }
+
+    // ══════════════════════════════════════════
+    //   ORDER
+    // ══════════════════════════════════════════
+    function goOrderSelect() {
+      const el = document.getElementById('order-select-list');
+      const active = D.activities.filter(a => a.status === 'active');
+      if (!active.length) {
+        el.innerHTML = '<div class="empty-state">目前沒有進行中的點餐活動</div>';
+      } else {
+        el.innerHTML = active.map(a => `
+      <div class="activity-card" style="cursor:pointer" onclick="goOrderActivity(${a.id})">
+        <div class="activity-info">
+          <div class="activity-name">${a.name} <span class="badge badge-active">進行中</span></div>
+          <div class="activity-meta">日期: ${a.date} ｜ 餐點: ${a.meals.length} 項 ｜ 飲料: ${a.drinks.length} 項</div>
+        </div>
+        <div><button class="btn btn-green btn-sm">開始點餐 →</button></div>
+      </div>
+    `).join('');
+      }
+      show('order-select');
+    }
+
+    let currentOrderActivityId = null;
+    let selectedMeal = null;
+    let selectedDrink = null;
+
+    function goOrderActivity(id) {
+      const a = getActivity(id);
+      if (!a) return;
+      currentOrderActivityId = id;
+      selectedMeal = null;
+      selectedDrink = null;
+
+      document.getElementById('order-topbar-title').textContent = a.name;
+      document.getElementById('order-act-name').textContent = a.name;
+      document.getElementById('order-act-date').textContent = '日期：' + a.date;
+
+      // dept select
+      const deptSel = document.getElementById('order-dept');
+      deptSel.innerHTML = D.depts.map(d => `<option value="${d.code}">${d.code} ${d.name}</option>`).join('');
+      deptSel.onchange = () => updateMemberSelect();
+      updateMemberSelect();
+
+      // meals
+      const mealEl = document.getElementById('meal-options');
+      mealEl.innerHTML = a.meals.map((m, i) => `
+    <div class="option-card" id="meal-card-${i}" onclick="selectMeal(${i})">
+      <div class="option-dot" id="meal-dot-${i}"></div>
+      <div class="option-card-label">${m}</div>
+    </div>
+  `).join('');
+
+      // drinks
+      const drinkEl = document.getElementById('drink-options');
+      drinkEl.innerHTML = a.drinks.map((d, i) => `
+    <div class="option-card" id="drink-card-${i}" onclick="selectDrink(${i})">
+      <div class="option-dot" id="drink-dot-${i}"></div>
+      <div class="option-card-label">${d}</div>
+    </div>
+  `).join('');
+
+      // note
+      const noteLabel = a.noteLabel || '';
+      const noteSection = document.getElementById('note-section');
+      if (noteLabel) {
+        noteSection.style.display = '';
+        document.getElementById('note-section-title').textContent = noteLabel;
+        document.getElementById('order-note').value = '';
+      } else {
+        noteSection.style.display = 'none';
+      }
+
+      show('order');
+    }
+
+    function updateMemberSelect() {
+      const dept = document.getElementById('order-dept').value;
+      const sel = document.getElementById('order-member');
+      const members = D.members.filter(m => m.dept === dept);
+      sel.innerHTML = '<option value="">-- 選擇人員 --</option>' + members.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+    }
+
+    function selectMeal(i) {
+      selectedMeal = i;
+      const a = getActivity(currentOrderActivityId);
+      document.querySelectorAll('[id^="meal-card-"]').forEach((el, idx) => {
+        el.className = 'option-card' + (idx === i ? ' selected' : '');
+        document.getElementById('meal-dot-' + idx).style.cssText = idx === i ? 'border-color:var(--primary);background:var(--primary)' : '';
+      });
+    }
+
+    function selectDrink(i) {
+      selectedDrink = i;
+      document.querySelectorAll('[id^="drink-card-"]').forEach((el, idx) => {
+        el.className = 'option-card' + (idx === i ? ' selected-green' : '');
+        document.getElementById('drink-dot-' + idx).style.cssText = idx === i ? 'border-color:var(--green);background:var(--green)' : '';
+      });
+    }
+
+    function submitOrder() {
+      const a = getActivity(currentOrderActivityId);
+      const nameManual = document.getElementById('order-name-manual').value.trim();
+      const nameSelect = document.getElementById('order-member').value;
+      const name = nameManual || nameSelect;
+      const dept = document.getElementById('order-dept').value;
+      const note = document.getElementById('order-note').value.trim();
+
+      if (!name) { alert('請選擇或填寫姓名'); return; }
+      if (selectedMeal === null) { alert('請選擇餐點'); return; }
+      if (selectedDrink === null) { alert('請選擇飲料'); return; }
+
+      // Check duplicate
+      const existing = a.orders.find(o => o.name === name && o.dept === dept);
+      if (existing) {
+        if (!confirm(`「${name}」已有點餐紀錄，是否覆蓋？`)) return;
+        existing.meal = a.meals[selectedMeal];
+        existing.drink = a.drinks[selectedDrink];
+        existing.note = note;
+      } else {
+        a.orders.push({ id: D.nextId++, name, dept, meal: a.meals[selectedMeal], drink: a.drinks[selectedDrink], note });
+      }
+
+      save();
+      showToast(`✅ ${name} 點餐完成！`);
+      document.getElementById('order-name-manual').value = '';
+      document.getElementById('order-member').value = '';
+      selectedMeal = null; selectedDrink = null;
+      document.querySelectorAll('[id^="meal-card-"],[id^="drink-card-"]').forEach(el => { el.className = 'option-card'; });
+      document.querySelectorAll('[id^="meal-dot-"],[id^="drink-dot-"]').forEach(el => { el.style.cssText = ''; });
+      document.getElementById('order-note').value = '';
+    }
+
+    // ══════════════════════════════════════════
+    //   REPORT
+    // ══════════════════════════════════════════
+    function goReportSelect() {
+      const el = document.getElementById('report-select-list');
+      if (!D.activities.length) {
+        el.innerHTML = '<div class="empty-state">尚無活動資料</div>';
+      } else {
+        el.innerHTML = D.activities.map(a => `
+      <div class="activity-card" style="cursor:pointer" onclick="goReportActivity(${a.id})">
+        <div class="activity-info">
+          <div class="activity-name">${a.name} <span class="badge ${a.status === 'active' ? 'badge-active' : 'badge-ended'}">${a.status === 'active' ? '進行中' : '已結束'}</span></div>
+          <div class="activity-meta">日期: ${a.date} ｜ 已點餐: ${a.orders.length} 人</div>
+        </div>
+        <div><button class="btn btn-purple btn-sm">查看報表 →</button></div>
+      </div>
+    `).join('');
+      }
+      show('report-select');
+    }
+
+    let currentReportActivityId = null;
+
+    function goReportActivity(id) {
+      currentReportActivityId = id;
+      const a = getActivity(id);
+
+      document.getElementById('report-title').textContent = a.name + ' 報表';
+      document.getElementById('report-subtitle').textContent = `日期：${a.date}｜共 ${a.orders.length} 人`;
+
+      // Stats
+      const mealCounts = {};
+      a.meals.forEach(m => mealCounts[m] = 0);
+      a.orders.forEach(o => { if (mealCounts[o.meal] !== undefined) mealCounts[o.meal]++; });
+      const statsEl = document.getElementById('report-stats');
+      statsEl.innerHTML = `
+    <div class="report-stat"><div class="report-stat-val">${a.orders.length}</div><div class="report-stat-label">總點餐人數</div></div>
+    ${a.meals.map(m => `<div class="report-stat"><div class="report-stat-val" style="font-size:22px">${mealCounts[m] || 0}</div><div class="report-stat-label">${m}</div></div>`).join('')}
+  `;
+
+      // Detail table
+      const tbody = document.getElementById('report-detail-body');
+      if (!a.orders.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">尚無點餐紀錄</td></tr>';
+      } else {
+        tbody.innerHTML = a.orders.map((o, i) => `
+      <tr>
+        <td style="color:var(--muted);font-size:12px">${i + 1}</td>
+        <td style="font-weight:600">${o.name}</td>
+        <td><span class="badge badge-active" style="font-size:11px">${getDeptLabel(o.dept)}</span></td>
+        <td style="color:var(--primary)">${o.meal}</td>
+        <td style="color:var(--green)">${o.drink}</td>
+        <td style="color:var(--muted);font-size:12px">${o.note || '—'}</td>
+      </tr>
+    `).join('');
+      }
+
+      // Summary
+      renderSummaryTable(a);
+
+      show('report');
+    }
+
+    function renderSummaryTable(a) {
+      const el = document.getElementById('report-summary');
+      const meals = a.meals;
+      const drinks = a.drinks;
+
+      const totalM = {}; const totalD = {};
+      meals.forEach(m => totalM[m] = 0); drinks.forEach(d => totalD[d] = 0);
+
+      let html = `<table class="summary-tbl">
+    <thead>
+      <tr>
+        <th rowspan="2" style="text-align:left;min-width:130px">部門</th>
+        <th colspan="${meals.length}" class="sub">主食</th>
+        <th rowspan="2">小計</th>
+        <th colspan="${drinks.length}" class="sub">飲料</th>
+        <th rowspan="2">小計</th>
+      </tr>
+      <tr>${meals.map(m => `<th style="font-size:11px">${m}</th>`).join('')}${drinks.map(d => `<th style="font-size:11px">${d}</th>`).join('')}</tr>
+    </thead>
+    <tbody>`;
+
+      D.depts.forEach(dept => {
+        const orders = a.orders.filter(o => o.dept === dept.code);
+        if (!orders.length) return;
+        const mC = {}; const dC = {};
+        meals.forEach(m => mC[m] = 0); drinks.forEach(d => dC[d] = 0);
+        orders.forEach(o => { if (mC[o.meal] !== undefined) mC[o.meal]++; if (dC[o.drink] !== undefined) dC[o.drink]++; });
+        meals.forEach(m => totalM[m] = (totalM[m] || 0) + (mC[m] || 0));
+        drinks.forEach(d => totalD[d] = (totalD[d] || 0) + (dC[d] || 0));
+        html += `<tr>
+      <td class="dept-td">${dept.code} ${dept.name}</td>
+      ${meals.map(m => `<td>${mC[m] || 0}</td>`).join('')}
+      <td class="total-td">${orders.length}</td>
+      ${drinks.map(d => `<td>${dC[d] || 0}</td>`).join('')}
+      <td class="total-td">${orders.length}</td>
+    </tr>`;
+      });
+
+      html += `<tr class="total-row">
+    <td style="text-align:left;font-family:'Noto Sans TC',sans-serif">合計</td>
+    ${meals.map(m => `<td>${totalM[m] || 0}</td>`).join('')}
+    <td>${a.orders.length}</td>
+    ${drinks.map(d => `<td>${totalD[d] || 0}</td>`).join('')}
+    <td>${a.orders.length}</td>
+  </tr></tbody></table>`;
+
+      el.innerHTML = html;
+    }
+
+    function copySummary() {
+      const a = getActivity(currentReportActivityId);
+      const meals = a.meals; const drinks = a.drinks;
+      let text = `\t${meals.join('\t')}\t小計\t${drinks.join('\t')}\t小計\n`;
+      const totalM = {}; const totalD = {};
+      meals.forEach(m => totalM[m] = 0); drinks.forEach(d => totalD[d] = 0);
+      D.depts.forEach(dept => {
+        const orders = a.orders.filter(o => o.dept === dept.code);
+        if (!orders.length) return;
+        const mC = {}; const dC = {};
+        meals.forEach(m => mC[m] = 0); drinks.forEach(d => dC[d] = 0);
+        orders.forEach(o => { if (mC[o.meal] !== undefined) mC[o.meal]++; if (dC[o.drink] !== undefined) dC[o.drink]++; totalM[o.meal] = (totalM[o.meal] || 0) + 1; totalD[o.drink] = (totalD[o.drink] || 0) + 1; });
+        text += `${dept.code} ${dept.name}\t${meals.map(m => mC[m] || 0).join('\t')}\t${orders.length}\t${drinks.map(d => dC[d] || 0).join('\t')}\t${orders.length}\n`;
+      });
+      text += `合計\t${meals.map(m => totalM[m] || 0).join('\t')}\t${a.orders.length}\t${drinks.map(d => totalD[d] || 0).join('\t')}\t${a.orders.length}`;
+      navigator.clipboard.writeText(text).then(() => showToast('✅ 已複製！可直接貼到 Excel')).catch(() => showToast('複製失敗，請手動選取'));
+    }
+
+    function downloadOrders() {
+      const a = getActivity(currentReportActivityId);
+      const bom = '\uFEFF';
+      let csv = bom + '編號,姓名,部門,主食,飲料,備註\n';
+      a.orders.forEach((o, i) => {
+        csv += `${i + 1},"${o.name}","${getDeptLabel(o.dept)}","${o.meal}","${o.drink}","${o.note || ''}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = `${a.name}_點餐清單.csv`;
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('✅ 下載完成');
+    }
+
+    // ══ INIT ══
+    goReportSelect();
+  </script>
+</body>
+
+</html>
